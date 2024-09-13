@@ -1,0 +1,40 @@
+{
+    "Assert": {
+        "prefix": [ "assert" ],
+        "body": [ "(assert $1)$0" ],
+        "description": "Assert statement"
+    },
+    "EndOfFile": {
+        "prefix": [ "eof", "output" ],
+        "body": [
+            "(check-sat)",
+            "(get-model)"
+        ]
+    },
+    "Function": {
+        "prefix": [ "f", "fun", "function" ],
+        "body": [
+            "(define-fun ${1:f} ((${2:X} ${3:Int})) ${4:Bool}",
+            "\t$0",
+            ")"
+        ]
+    },
+    "Const": {
+        "prefix": [ "c", "constant" ],
+        "body": [
+            "(declare-const ${1:X} ${2:Int})"
+        ]
+    },
+    "ConstInteger": {
+        "prefix": [ "ci", "constantinteger" ],
+        "body": [
+            "(declare-const ${1:X} Int)$0"
+        ]
+    },
+    "ConstBool": {
+        "prefix": [ "cb", "constantboolean" ],
+        "body": [
+            "(declare-const ${1:X} Bool)$0"
+        ]
+    }
+}
