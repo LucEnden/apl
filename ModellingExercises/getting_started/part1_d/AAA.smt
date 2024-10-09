@@ -6,10 +6,11 @@
 ;   Prime numbers are the numbers that have only two factors, that are, 1 and the number itself.
 
 ;Reasoning
-;   Any natural number P greater then 0 is considered prime when, if we where to divide it by any integer D,
-;   i.e. "/ P D" (given that D greater then 0), the product can only by 1 or P
-
-; x/y = z <=> x = yz
+;   Any natural number P greater then 1 is considered prime when:
+;   P / D = 1 or P / D = P
+;   where
+;   P > 1 and D > 1
+;   
 
 (declare-const P Int)
 (declare-const D Int)
