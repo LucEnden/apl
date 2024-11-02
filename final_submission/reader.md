@@ -9,7 +9,7 @@ Modeling Excersizes:
 Als een introductie opdracht na de getting started
 
 - Medicine Testing A (6,3,2) (**)
-Ik heb altijd al veel moeite gehad met grote verhaaltjes sommen waarbij je met (relatief) veel gegeven te maken hebt. Het is mij ook door u aangeraden, en was het eens met de aanrading
+Ik heb altijd al veel moeite gehad met grote verhaaltjes sommen waarbij je met (relatief) veel gegeven te maken hebt. De opdarcht is mij ook door herman aangeraden, en was het eens met de aanrading
 
 - Knight's Tour (***)
 Omdat ik op voorhand helemaal geen oplossing zag buiten een programatische oplossing (met een matrix en for loop), dus vond ik het een mooie uitdaging Hiermee mijn programmers mindset uit te dagen

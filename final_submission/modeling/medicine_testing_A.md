@@ -89,3 +89,19 @@ To emulate a test round I will be employing a custom fnuction
 ```smt
 (declare-fun testRound ())
 ```
+
+---
+31/10/2024:
+
+In full honesty: I just went trough the med.2.smt example for about 10 second to glance at how its done. What I saw that jumped out the most was:
+- The SMT-LIB `(get-value ...)` for each of the individual medicine 
+  (represented as unique integers from 1 trough 7, given the block design `7, 3, 2`). I found out already that my idea for representing the medicine as all values of 1 would not work, as their is no uniqueness in that setup to check whether any give one was tested, so it makes sence to see this
+- the use of `ite` to sum up values 
+
+---
+1/11/2024
+
+After one day of trying to find a solution on paper, and being unsuccesfull, I allowed myself to copy the first part of `med.2.smt`, which is the `(forall ((r Int)) ...`
+
+The forall makes sense, it rougly translates to "for all rounds, the sum of the medicine"
+
