@@ -22,7 +22,7 @@
     "DeclareFunction": {
         "prefix": [ "df", "declare-fun", "declare-function" ],
         "body": [
-            "(declare-fun ${1:f} ((${2:X} ${3:Int})) ${4:Bool})"
+            "(declare-fun ${1:f} (Int) ${2:Bool})"
         ]
     },
     "Const": {
