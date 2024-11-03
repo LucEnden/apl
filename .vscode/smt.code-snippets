@@ -11,12 +11,18 @@
             "(get-model)"
         ]
     },
-    "Function": {
-        "prefix": [ "f", "fun", "function" ],
+    "DefineFunction": {
+        "prefix": [ "df", "define-fun", "define-function" ],
         "body": [
             "(define-fun ${1:f} ((${2:X} ${3:Int})) ${4:Bool}",
             "\t$0",
             ")"
+        ]
+    },
+    "DeclareFunction": {
+        "prefix": [ "df", "declare-fun", "declare-function" ],
+        "body": [
+            "(declare-fun ${1:f} ((${2:X} ${3:Int})) ${4:Bool})"
         ]
     },
     "Const": {
