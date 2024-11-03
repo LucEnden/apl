@@ -29,67 +29,6 @@ Lets brake this problem down:
     - For example, if a test round is a list, then the first test round = [ A, B, C ] and the second round = [ A, B, D ], then their are no other test rounds in which A and B can occer together
     - This limits the amount of combinations we can test, thus we might not find an answer given certain implementations
 
-## Domain and Limitations
-
-### Medicine
-The 6 medicines will be represented as integers
-```smt
-(declare-const A Int)
-(declare-const B Int)
-(declare-const C Int)
-(declare-const D Int)
-(declare-const E Int)
-(declare-const F Int)
-```
-
-We limit each medicine to be either 1 (being tested) or 0 (not being tested).
-```smt
-(and
-(<= 1 A)
-(<= 1 B)
-(<= 1 C)
-(<= 1 D)
-(<= 1 E)
-(<= 1 F)
-)
-```
-
-I dont know if we can write this in a neater way using a forall for example.
-If I feel like it and I have time to spear i might test this out.
-<!-- I tested this and it did not make sense to have a for all on multiple variables, as you would still have to enclose all of the values in an and case with each variable <= 5
-
-(forall ((A)(B)(C)(D)(E)(F)))
-    (and
-        (<= 5 A)
-        (<= 5 B)
-        (<= 5 C)
-        (<= 5 D)
-        (<= 5 E)
-        (<= 5 F)
-    )
-)
-
-this also trew an error, so there is that!
--->
-
-
-
-### Test Rounds
-Test rounds will be represented as an integer.
-```smt
-(declare-const T Int)
-```
-
-We limit the amount of test rounds to 10
-```smt
-(<= T 10)
-```
-
-To emulate a test round I will be employing a custom fnuction
-```smt
-(declare-fun testRound ())
-```
-
 ---
 31/10/2024:
 
@@ -105,3 +44,10 @@ After one day of trying to find a solution on paper, and being unsuccesfull, I a
 
 The forall makes sense, it rougly translates to "for all rounds, the sum of the medicine"
 
+---
+3/11/2024
+
+I solved it, but again, not without the help of the example.
+
+The forall I copied (`In each round, (exactly) 3 medicines are tested`) was an inspiration for how I could implement the `Every medicine is tested 5 times` constrained on the domain.
+I tried to do the same for the `Every pair of (two) medicines occurs together in 2 and no more than 2 rounds` constrained, but I just could not quite figure out how to do so, until I saw the implies in the exampele.
