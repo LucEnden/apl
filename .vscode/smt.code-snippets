@@ -42,5 +42,11 @@
         "body": [
             "(declare-const ${1:X} Bool)$0"
         ]
+    },
+    "ConstString": {
+        "prefix": [ "cs", "constantstring" ],
+        "body": [
+            "(declare-const ${1:X} String \"$2\")$0"
+        ]
     }
 }
