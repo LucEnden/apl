@@ -27,10 +27,7 @@
 (declare-fun Edge (Int Int) Int)
 (define-fun EdgeCostContstrains () Bool
     (and
-        ; Edge costs default to 0
-        ; ...
-
-        ; Provided costs function values
+        ; Define provided edge costs
         (= (Edge A B) 6)
         (= (Edge A C) 7)
         (= (Edge B C) 1)
@@ -40,6 +37,44 @@
         (= (Edge C F) 1)
         (= (Edge D E) 5)
         (= (Edge E F) 3)
+
+        ; Edge costs is always 0, unless explicitly specified above
+        (forall ((v1 Int) (v2 Int))
+            (implies
+                (not
+                    (or
+                        (and (= v1 A) (= v2 B)) 
+                        (and (= v1 B) (= v2 A))
+
+                        (and (= v1 A) (= v2 C))
+                        (and (= v1 C) (= v2 A))
+
+                        (and (= v1 B) (= v2 C))
+                        (and (= v1 C) (= v2 B))
+
+                        (and (= v1 B) (= v2 D))
+                        (and (= v1 D) (= v2 B))
+
+                        (and (= v1 B) (= v2 E))
+                        (and (= v1 E) (= v2 B))
+
+                        (and (= v1 C) (= v2 E))
+                        (and (= v1 E) (= v2 C))
+
+                        (and (= v1 C) (= v2 F))
+                        (and (= v1 F) (= v2 C))
+
+                        (and (= v1 D) (= v2 E))
+                        (and (= v1 E) (= v2 D))
+
+                        (and (= v1 E) (= v2 F))
+                        (and (= v1 F) (= v2 E))
+                    )
+                )
+                ; Default to 0
+                (= (Edge v1 v2) 0)
+            )
+        )
 
         ; Edge's travel costs are the same, regardless of direction 
         (forall ((v1 Int) (v2 Int) (c Int))
@@ -51,36 +86,42 @@
     )
 )
 
-; An edge is valid if and only if the value for Edge which is given the same vertices as for ValidEdge is greater then 0 
-(declare-fun ValidEdge (Int Int) Bool)
-(define-fun ValidEdgeContstrains () Bool
-    (and
-        (forall ((v1 Int)(v2 Int))
-            (implies
-                (and ; Edges are valid if 
-                    ; the cost is greater then 0
-                    (> 0 (Edge v1 v2)) 
-                    ; the provided vertexes are not the same
-                    (not (= v1 v2))
-                )
-                (= (ValidEdge v1 v2) true)
-            )
-        )
-    )
+; Edge's are modeled to be valid if and only if the value for Edge which is given the same vertices as for ValidEdge is greater then 0 
+(define-fun ValidEdge ((v1 Int) (v2 Int)) Bool
+    (> (Edge v1 v2) 0)
 )
 
-; A salesman's path is defined as a function on all vertexes (A trough F, in any order), that returns the travel cost 
+; A salesman's path is defined as a function on all provided vertexes (in order), that returns the travel cost 
 ; This allows simple ranking of paths by the sum of edges
-; (define-fun SalesPath ((V1 Int) (V2 Int) (V3 Int) (V4 Int) (V5 Int) (V6 Int)) Int
-;     ; ...
-; )
+; If any of the provided vertexes dont have a valid path 
+(define-fun SalesPath ((v1 Int) (v2 Int) (v3 Int) (v4 Int) (v5 Int) (v6 Int)) Int
+    (ite
+        ; Check whether the path is even valid before calculating its cost
+        (and
+            (ValidEdge v1 v2)
+            (ValidEdge v2 v3)
+            (ValidEdge v3 v4)
+            (ValidEdge v4 v5)
+            (ValidEdge v5 v6)
+        )
+        ; Return cost of path once its deemed valid
+        (+
+            (Edge v1 v2)
+            (Edge v2 v3)
+            (Edge v3 v4)
+            (Edge v4 v5)
+            (Edge v5 v6)
+        )
+        ; Return inavlid cost
+        0 
+    )
+)
 
 (assert 
 (and
 
 VertexConstrains
 EdgeCostContstrains
-ValidEdgeContstrains
 
 ) ; end of and
 ) ; end of assert
@@ -88,18 +129,13 @@ ValidEdgeContstrains
 (check-sat)
 ; (get-model)
 (get-value (
-    ; Does the inverse travel cost constain work?
-    (Edge A B)
-    (=
-        (Edge A B)
-        (Edge B A)
-    ) ; Expected = True
+    (Edge -1 -1)                ; Expected: 0
+    (Edge 0 0)                  ; Expected: 0
+    (Edge 1 1)                  ; Expected: 0
+    (Edge 1 2)                  ; Expected: 6
+    (Edge A B)                  ; Expected: 6
+    (= (Edge 1 2) (Edge A B) )  ; Expected: true
 
-    ; Show that the ValidEdge function is true for at least vertex A
-    (ValidEdge A B) ; True
-    (ValidEdge A C) ; True
-    (ValidEdge A D) ; False
-    (ValidEdge A E) ; False
-    (ValidEdge A F) ; False
-    (ValidEdge A 7) ; False
+    ; Does the inverse travel cost constain work?
+    (= (Edge A B) (Edge B A) ) ; Expected = true
 ))
