@@ -2,6 +2,7 @@
 ; Make use of Z3 to find the cheapest path to visit all six ‘cities’ in this picture. 
 ; (The numbers along the edges indicate the travelcost between the cities).
 
+
 ; Vertexes
 (declare-const A Int)
 (declare-const B Int)
@@ -9,10 +10,10 @@
 (declare-const D Int)
 (declare-const E Int)
 (declare-const F Int)
+
+
 (define-fun VertexConstrains () Bool
-    ; Vertices need to be unique 
-    ; I dont use distinct, which would be more suiteable for a generalized solution ...
-    ; But I will only be focusing on the graph from the excersises PDF, so hard coding them seems fine for now.
+    ; Vertices need to be unique
     (and
         (= A 1)
         (= B 2)
@@ -22,6 +23,10 @@
         (= F 6)
     )
 )
+(define-fun ValidVertex ((v Int)) Bool
+    (<= 1 v 6)
+)
+
 
 ; An edge is defined as a function on 2 vertexes, which returns a number representing the travelcost from vertex A to B
 (declare-fun Edge (Int Int) Int)
@@ -86,25 +91,36 @@
     )
 )
 
+
 ; Edge's are modeled to be valid if and only if the value for Edge which is given the same vertices as for ValidEdge is greater then 0 
 (define-fun ValidEdge ((v1 Int) (v2 Int)) Bool
     (> (Edge v1 v2) 0)
 )
 
-; A salesman's path is defined as a function on all provided vertexes (in order), that returns the travel cost 
+
+(define-fun ValidPath ((v1 Int) (v2 Int) (v3 Int) (v4 Int) (v5 Int) (v6 Int)) Bool
+    (and
+        (distinct v1 v2 v3 v4 v5 v6)
+        (ValidVertex v1)
+        (ValidVertex v2)
+        (ValidVertex v3)
+        (ValidVertex v4)
+        (ValidVertex v5)
+        (ValidVertex v6)
+        (ValidEdge v1 v2)
+        (ValidEdge v2 v3)
+        (ValidEdge v3 v4)
+        (ValidEdge v4 v5)
+        (ValidEdge v5 v6)
+    )
+)
+
+
+; A salesman's path is defined as a function on all provided vertexes that returns the travel cost 
 ; This allows simple ranking of paths by the sum of edges
-; If any of the provided vertexes dont have a valid path 
 (define-fun SalesPath ((v1 Int) (v2 Int) (v3 Int) (v4 Int) (v5 Int) (v6 Int)) Int
     (ite
-        ; Check whether the path is even valid before calculating its cost
-        (and
-            (ValidEdge v1 v2)
-            (ValidEdge v2 v3)
-            (ValidEdge v3 v4)
-            (ValidEdge v4 v5)
-            (ValidEdge v5 v6)
-        )
-        ; Return cost of path once its deemed valid
+        (ValidPath v1 v2 v3 v4 v5 v6)
         (+
             (Edge v1 v2)
             (Edge v2 v3)
@@ -112,30 +128,55 @@
             (Edge v4 v5)
             (Edge v5 v6)
         )
-        ; Return inavlid cost
         0 
     )
 )
 
-(assert 
+
+; Variables used to construct the shortest path
+(declare-const P1 Int)
+(declare-const P2 Int)
+(declare-const P3 Int)
+(declare-const P4 Int)
+(declare-const P5 Int)
+(declare-const P6 Int)
+(declare-const ShortestPath Int)
+
+
+(assert
 (and
 
-VertexConstrains
-EdgeCostContstrains
+    VertexConstrains
+    EdgeCostContstrains
+    (ValidPath P1 P2 P3 P4 P5 P6)
+    (= ShortestPath (SalesPath P1 P2 P3 P4 P5 P6))
 
-) ; end of and
-) ; end of assert
+) ; end of AND
+) ; end of ASSERT
+(minimize ShortestPath)
+
 
 (check-sat)
-; (get-model)
 (get-value (
-    (Edge -1 -1)                ; Expected: 0
-    (Edge 0 0)                  ; Expected: 0
-    (Edge 1 1)                  ; Expected: 0
-    (Edge 1 2)                  ; Expected: 6
-    (Edge A B)                  ; Expected: 6
-    (= (Edge 1 2) (Edge A B) )  ; Expected: true
-
-    ; Does the inverse travel cost constain work?
-    (= (Edge A B) (Edge B A) ) ; Expected = true
+    P1 P2 P3 P4 P5 P6
+    (SalesPath P1 P2 P3 P4 P5 P6)
+    ShortestPath
 ))
+
+
+; Sanity checks, left here for archiving purposes
+; (get-value (
+;     (Edge -1 -1)                ; Expected: 0
+;     (Edge 0 0)                  ; Expected: 0
+;     (Edge 1 1)                  ; Expected: 0
+;     (Edge 1 2)                  ; Expected: 6
+;     (Edge A B)                  ; Expected: 6
+;     (= (Edge 1 2) (Edge A B) )  ; Expected: true
+;     (= (Edge A B) (Edge B A) )  ; Expected: true
+    
+;     (SalesPath A B C D E F)     ; Expected: 0 (no edge from C to D)
+;     (SalesPath A B C F E D)     ; Expected: 6 + 1 + 1 + 3 + 5 = 16
+;     ; Sales path above was calculated by hand to be one of two shortests for the specified graph:
+;     ; Path: A -> B -> C -> F -> E -> D | Length: 16
+;     ; Path: D -> E -> F -> C -> B -> A | Length: 16
+; ))
