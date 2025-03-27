@@ -2,8 +2,8 @@
 ; Slide coins to empty positions. The red coin should end up at the empty spot at the right end.
 ; Model this with SMT and let Z3 find a solution.
 
-
-; I define the coordinate system to start at 0/0 and to be stricly possitive, so the red coin starts at 0/0 and needs to move to 0/9
+; Definitions:
+; - the coordinate system starts at 0/0 and is stricly possitive (so the red coin starts at 0/0 and needs to move to 0/9)
 
 
 (declare-const Coin_A Int)
@@ -79,6 +79,7 @@
                 (<= 0 T MaxT)
                 (<= 0 C 8)
             )
+            ; I can essentially move this to the assert body, given that the forall and implies signature is the exact same, which might win some performance
             (and
                 (<= 0 (LocX C T) 9)
                 ; Y can only be 1, if X is either 3, 5 or 7
@@ -124,31 +125,50 @@
 
 (assert 
 (and
-    (= MaxT 20)
+    (= MaxT 30)
     CoinIdentifiers
     CoinStartingLocations
     PuzzleBoundaries
 
+    ; TODO: implement coin movement, starting with moving coins to the right
+
+    ; The approach used here is to find the location for coin C at the next point in time T
     (forall ((T Int) (C Int))
         (implies
             (and
-                (<= 0 T MaxT)
+                (<= 1 T MaxT) ; Start at 1 since possitions at T = 0 are predefined
                 (<= 0 C 8)
             )
             (=
-                ; At point in time T ...
+                ; At point in time T, the X value for coin C is equal to ...
                 (LocX C T)
-                ; the X value for coin C is equal to ...
                 (+
-                    ; the value for X at the previous point in time plus ...
+                    ; the value for X at the previous point in time plus 1 ...
                     (LocX C (- T 1)) 
-                    ; 1 iff the coin is not:
-                    ; - already at the far right, i.e. X at T - 1 < 9
-                    ; - in one of the upper spots, i.e. Y at T = 0
+                    ; if the coin is:
+                    ; 1. not already at the far right, i.e. X at T - 1 < 9
+                    ; 2. not in one of the upper spots, i.e. Y at T = 0
+                    ; 3. the square it wants to move to is not already occupied, i.e. ... (see not case)
                     (ite
                         (and
                             (< (LocX C (- T 1)) 9)
                             (= (LocY C T) 0)
+                            ; (not
+                            ;     (forall ((C1 Int) (C2 Int) (C3 Int) (C4 Int) (C5 Int) (C6 Int) (C7 Int) (C8 Int))
+                            ;         (and
+                            ;             (<= 0 C1 8)
+                            ;             (<= 0 C2 8)
+                            ;             (<= 0 C3 8)
+                            ;             (<= 0 C4 8)
+                            ;             (<= 0 C5 8)
+                            ;             (<= 0 C6 8)
+                            ;             (<= 0 C7 8)
+                            ;             (<= 0 C8 8)
+                            ;             (distinct C C1 C2 C3 C4 C5 C6 C7 C8)
+                            ;             (not (LocationIsEqualToAny C C1 C2 C3 C4 C5 C6 C7 C8 T))
+                            ;         )
+                            ;     )
+                            ; )
                         )
                         1
                         0
@@ -162,7 +182,6 @@
 ); End of assert
 
 (check-sat)
-; (get-model)
 (get-value (
     (LocX Coin_A 0)
     (LocX Coin_A 1)
@@ -190,3 +209,4 @@
     (LocX Coin_B 10)
     (LocX Coin_B 11)
 ))
+(get-model)

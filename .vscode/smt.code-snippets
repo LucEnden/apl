@@ -4,6 +4,19 @@
         "body": [ "(assert $1)$0" ],
         "description": "Assert statement"
     },
+    "AssertAnd": {
+        "prefix": [ "aa", "assert-and" ],
+        "body": [ 
+            "(assert",
+            "(and",
+            "\t",
+            "\t$0",
+            "\t",
+            "); End of AND",
+            "); End of ASSERT"
+        ],
+        "description": "Assert statement"
+    },
     "EndOfFile": {
         "prefix": [ "eof", "output" ],
         "body": [
@@ -69,8 +82,8 @@
         "prefix": [ "im", "implies_" ],
         "body": [
             "(implies",
-            "\t($1)",
             "\t($0)",
+            "\t()",
             ")"
         ]
     }
