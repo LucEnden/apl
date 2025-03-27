@@ -48,5 +48,30 @@
         "body": [
             "(declare-const ${1:X} String \"$2\")$0"
         ]
+    },
+    "ForAll": {
+        "prefix": [ "fa", "forall_" ],
+        "body": [
+            "(forall ((${1:X} ${2:Int}))",
+            "\t$0",
+            ")"
+        ]
+    },
+    "GetValue": {
+        "prefix": [ "gv", "getvalue" ],
+        "body": [
+            "(get-value (",
+            "\t$0",
+            "))"
+        ]
+    },
+    "Implies": {
+        "prefix": [ "im", "implies_" ],
+        "body": [
+            "(implies",
+            "\t($1)",
+            "\t($0)",
+            ")"
+        ]
     }
 }
